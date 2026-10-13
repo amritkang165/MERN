@@ -1,25 +1,34 @@
 import jwt from 'jsonwebtoken';
-import Customer from '../models/customer.model.js'
+import Customer from '../models/customer.model.js';
 
-export const isAuthenticated = async (req,res,next)=>{
-    const token=req.cookies.token
+export const isAuthenticated = async (req, res, next) => {
+    const cookieToken = req.cookies?.token;
+    const authHeader = req.headers.authorization;
+    const token = cookieToken || (authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null);
 
-    if(!token){
+    if (!token) {
         return res.status(401).json({
-            message:"Not Authorized, Please Login"
-        })
+            message: 'Not Authorized, Please Login'
+        });
     }
 
-    const decoded=jwt.verify(token,process.env.JWT_SECRET)
-
-    const user=await Customer.findById(decoded.customerId)
-
-    if(!user){
+    let decoded;
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET || 'shopkart_local_secret');
+    } catch {
         return res.status(401).json({
-            message:"Not Authorized, Please Login"
-        })
+            message: 'Not Authorized, Please Login'
+        });
     }
 
-    req.user=user
-    next()
-}
+    const user = await Customer.findById(decoded.customerId);
+
+    if (!user) {
+        return res.status(401).json({
+            message: 'Not Authorized, Please Login'
+        });
+    }
+
+    req.user = user;
+    next();
+};

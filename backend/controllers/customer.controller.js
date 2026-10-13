@@ -182,13 +182,20 @@ export const loginCustomer = async (req, res) => {
     }
 };
 
-export const getCustomer=async(req,res)=>{
+export const getCustomer = async (req, res) => {
+    const { _id, fullName, email, phone } = req.user;
+
     res.status(200).json({
-        message:'Customer Authenticated',
-        success:true,
-        customerData:req.user
-    })
-}
+        message: 'Customer Authenticated',
+        success: true,
+        customerData: {
+            _id,
+            fullName,
+            email,
+            phone
+        }
+    });
+};
 
 
 // Logout Controller

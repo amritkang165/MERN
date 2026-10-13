@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
-:root { font-family: 'Manrope', sans-serif; font-synthesis: none; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
-:root { --mono: 'DM Mono', monospace; }
-body { margin: 0; min-width: 320px; }
+:root {
+  font-family: 'Manrope', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  --mono: 'DM Mono', monospace;
+  --pink-1: #ffe5ee;
+  --pink-2: #f6bfd0;
+  --pink-3: #f29db5;
+  --mint-1: #e6f7ed;
+  --mint-2: #caead6;
+  --mint-3: #a7dcb7;
+  --peach-1: #fff1e6;
+  --cream-1: #fffaf8;
+  --lavender-1: #f1ebff;
+  --ink: #2d3d3a;
+  --muted: #6d7d79;
+  --line: #f3dfe8;
+  --shadow-soft: rgba(67, 53, 58, 0.08);
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  background: linear-gradient(180deg, #fffaf8 0%, #f7f9f6 100%);
+}

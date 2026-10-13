@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 import { getCurrentCustomer, logoutCustomer } from '../services/api'
 
 function Navbar() {
   const [customer, setCustomer] = useState(null)
   const [checked, setChecked] = useState(false)
   const navigate = useNavigate()
+  const { count } = useCart()
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -51,6 +53,9 @@ function Navbar() {
         </nav>
 
         <div className="nav-icons">
+          <Link className="wishlist-nav-link" to="/wishlist">Wishlist</Link>
+          <Link className="wishlist-nav-link" to="/cart">Cart ({count})</Link>
+          <Link className="wishlist-nav-link" to="/orders">Orders</Link>
           <Link className="icon-btn" to="/products" aria-label="Search products" title="Search">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="7" />

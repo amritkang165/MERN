@@ -1,16 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
+import { addToWishlist } from '../services/api'
 
 const LOW_STOCK_THRESHOLD = 10
 const DISCOUNT_RATE = 0.2
-
-function readWishlist() {
-  try {
-    return JSON.parse(localStorage.getItem('wishlist') || '[]')
-  } catch {
-    return []
-  }
-}
 
 function Stars() {
   return (
@@ -24,18 +18,32 @@ function Stars() {
 
 function ProductCard({ product, tag }) {
   const isLow = product.stock <= LOW_STOCK_THRESHOLD
-  const [wished, setWished] = useState(() => readWishlist().includes(product._id))
+  const [wishlistState, setWishlistState] = useState('idle')
+  const [cartState, setCartState] = useState('idle')
   const oldPrice = Math.round(product.price / (1 - DISCOUNT_RATE))
+  const { addToCart } = useCart()
+  const isSaved = wishlistState === 'saved' || wishlistState === 'already-saved'
 
-  const toggleWish = () => {
-    const list = readWishlist()
-    const next = !wished
-    const updated = next
-      ? [...list, product._id]
-      : list.filter((id) => id !== product._id)
+  const handleAddToWishlist = async () => {
+    if (wishlistState === 'saving' || isSaved) return
 
-    localStorage.setItem('wishlist', JSON.stringify(updated))
-    setWished(next)
+    setWishlistState('saving')
+    try {
+      await addToWishlist(product._id)
+      setWishlistState('saved')
+    } catch (error) {
+      setWishlistState(error.response?.status === 409 ? 'already-saved' : 'error')
+    }
+  }
+
+  const handleAddToCart = async () => {
+    setCartState('adding')
+    try {
+      await addToCart(product._id, 1)
+      setCartState('added')
+    } catch (error) {
+      setCartState('error')
+    }
   }
 
   return (
@@ -45,13 +53,14 @@ function ProductCard({ product, tag }) {
       <div className="product-media">
         <img className="product-image" src={product.image} alt={product.name} />
         <button
-          className={`wish-btn${wished ? ' wished' : ''}`}
+          className={`wish-btn${isSaved ? ' wished' : ''}`}
           type="button"
-          onClick={toggleWish}
-          aria-label={wished ? 'Remove from wishlist' : 'Add to wishlist'}
-          aria-pressed={wished}
+          onClick={handleAddToWishlist}
+          disabled={wishlistState === 'saving' || isSaved}
+          aria-label={isSaved ? 'Added to wishlist' : 'Add to wishlist'}
+          aria-pressed={isSaved}
         >
-          {wished ? '♥' : '♡'}
+          {isSaved ? '♥' : '♡'}
         </button>
       </div>
 
@@ -72,6 +81,36 @@ function ProductCard({ product, tag }) {
         <Link className="button view-btn" to={`/products/${product._id}`}>
           View Details
         </Link>
+        <button
+          className="button button-primary cart-mini-button"
+          type="button"
+          onClick={handleAddToCart}
+          disabled={cartState === 'adding' || cartState === 'added'}
+        >
+          {cartState === 'adding' ? 'Adding...' : cartState === 'added' ? 'Added to Cart' : 'Add to Cart'}
+        </button>
+        <button
+          className={`wishlist-action${wishlistState === 'saved' ? ' saved' : ''}`}
+          type="button"
+          onClick={handleAddToWishlist}
+          disabled={wishlistState === 'saving' || isSaved}
+          aria-live="polite"
+        >
+          {wishlistState === 'saving' && 'Saving...'}
+          {wishlistState === 'saved' && '♥ Added to Wishlist'}
+          {wishlistState === 'already-saved' && '♥ Already in Wishlist'}
+          {(wishlistState === 'idle' || wishlistState === 'error') && '♡ Add to Wishlist'}
+        </button>
+        {wishlistState === 'error' && (
+          <p className="wishlist-action-error" role="alert">
+            Unable to save product. Please try again.
+          </p>
+        )}
+        {wishlistState === 'already-saved' && (
+          <p className="wishlist-action-error" role="status">
+            This product is already in your wishlist.
+          </p>
+        )}
       </div>
     </article>
   )

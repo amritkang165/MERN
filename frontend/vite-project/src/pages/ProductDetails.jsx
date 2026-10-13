@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Navbar from '../components/Navbar'
+import { useCart } from '../context/CartContext'
 import { getProductById } from '../services/api'
 
 const LOW_STOCK_THRESHOLD = 10
@@ -11,6 +12,7 @@ function ProductDetails() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [added, setAdded] = useState(false)
+  const { addToCart } = useCart()
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -29,9 +31,14 @@ function ProductDetails() {
     loadProduct()
   }, [id])
 
-  const handleAddToCart = () => {
-    setAdded(true)
-    setTimeout(() => setAdded(false), 1600)
+  const handleAddToCart = async () => {
+    try {
+      await addToCart(id, 1)
+      setAdded(true)
+      setTimeout(() => setAdded(false), 1600)
+    } catch {
+      setError('Unable to add to cart right now.')
+    }
   }
 
   return (
