@@ -161,3 +161,7 @@ The backend runs on port `8088` and groups its endpoints under:
 | `/orders` | Checkout, payment verification, and order history |
 
 Most customer-specific wishlist, cart, and order actions require signing in.
+
+## What I learned
+
+These assignments taught me how to build a complete MERN e-commerce app: connect React pages to Express APIs and MongoDB, and implement authentication, wishlists, carts, and checkout. I also learned to validate requests, protect customer data, and test the full flow from browsing products to placing an order.
