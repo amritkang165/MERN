@@ -47,7 +47,6 @@ export const createProduct = async (req, res) => {
 };
 
 
-// Get all products (supports ?search= and ?category=)
 
 export const getProducts = async (req, res) => {
     try {

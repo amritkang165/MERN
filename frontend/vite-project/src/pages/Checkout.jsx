@@ -168,6 +168,7 @@ function Checkout() {
 
       <section className="content-shell checkout-shell">
         <div className="checkout-form-card">
+          <Link className="button button-secondary" to="/cart">← Back to Cart</Link>
           <h1>Checkout</h1>
           <form onSubmit={handleSubmit} className="checkout-form">
             <div className="field-row">
